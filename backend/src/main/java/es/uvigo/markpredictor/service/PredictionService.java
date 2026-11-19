@@ -17,10 +17,13 @@ import java.util.List;
 public class PredictionService {
 
     private final StudentService studentService;
+    private final EnrollmentService enrollmentService;
     private final PredictionClient predictionClient;
 
-    public PredictionService(StudentService studentService, PredictionClient predictionClient) {
+    public PredictionService(StudentService studentService, EnrollmentService enrollmentService,
+                             PredictionClient predictionClient) {
         this.studentService = studentService;
+        this.enrollmentService = enrollmentService;
         this.predictionClient = predictionClient;
     }
 
@@ -30,16 +33,16 @@ public class PredictionService {
         return predictionClient.predict(s.getStudyHours(), s.getAttendance(), s.getPreviousGrade(), null);
     }
 
-    /** Una predicción por asignatura, con sus horas y su dificultad (P6 · HU-02). */
+    /** Una predicción por matrícula, con las horas de esa matrícula y la dificultad de la asignatura (P6 · HU-02). */
     public List<EnrollmentPrediction> predictEnrollments(Long studentId) {
         Student s = studentService.findById(studentId);
         List<EnrollmentPrediction> predictions = new ArrayList<>();
-        for (Enrollment e : s.getEnrollments()) {
+        for (Enrollment e : enrollmentService.history(studentId)) {
             PredictionResult r = predictionClient.predict(e.getStudyHours(), s.getAttendance(),
                     s.getPreviousGrade(), e.getSubject().getDifficulty());
-            predictions.add(new EnrollmentPrediction(e.getSubject().getName(),
-                    e.getSubject().getDifficulty().name(), e.getStudyHours(),
-                    r.base(), r.coefficient(), r.score()));
+            predictions.add(new EnrollmentPrediction(e.getId(), e.getSubject().getName(),
+                    e.getSubject().getDifficulty().name(), e.getCourse().getName(), e.getStudyHours(),
+                    e.getGrade(), r.base(), r.coefficient(), r.score()));
         }
         return predictions;
     }

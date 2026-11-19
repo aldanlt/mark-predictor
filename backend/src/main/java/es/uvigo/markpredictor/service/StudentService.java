@@ -3,27 +3,23 @@ package es.uvigo.markpredictor.service;
 import es.uvigo.markpredictor.dto.StudentRequest;
 import es.uvigo.markpredictor.exception.BadRequestException;
 import es.uvigo.markpredictor.exception.NotFoundException;
-import es.uvigo.markpredictor.model.Enrollment;
 import es.uvigo.markpredictor.model.Student;
-import es.uvigo.markpredictor.model.Subject;
 import es.uvigo.markpredictor.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-/** Registro y consulta de estudiantes con sus asignaturas (P6 · HU-04). */
+/** Registro y consulta de estudiantes. */
 @Service
 public class StudentService {
 
     private final StudentRepository studentRepository;
-    private final SubjectService subjectService;
+    private final EnrollmentService enrollmentService;
 
-    public StudentService(StudentRepository studentRepository, SubjectService subjectService) {
+    public StudentService(StudentRepository studentRepository, EnrollmentService enrollmentService) {
         this.studentRepository = studentRepository;
-        this.subjectService = subjectService;
+        this.enrollmentService = enrollmentService;
     }
 
     public List<Student> findAll() {
@@ -36,8 +32,8 @@ public class StudentService {
     }
 
     /**
-     * Guarda el estudiante y lo matricula en las asignaturas marcadas.
-     * @Transactional: si algo falla, no se guarda nada.
+     * Guarda el estudiante y lo matricula en las asignaturas marcadas (P6 · HU-04).
+     * @Transactional: si falla una matrícula, no se guarda nada (ni siquiera el estudiante).
      */
     @Transactional
     public Student create(StudentRequest request) {
@@ -59,26 +55,14 @@ public class StudentService {
         student.setStudyHours(request.studyHours());
         student.setAttendance(request.attendance());
         student.setPreviousGrade(request.previousGrade());
+        student = studentRepository.save(student);
 
-        Set<Long> alreadySelected = new HashSet<>();
         if (request.subjects() != null) {
             for (StudentRequest.SelectedSubject selected : request.subjects()) {
-                if (selected.studyHours() < 0) {
-                    throw new BadRequestException("Las horas de estudio no pueden ser negativas");
-                }
-                if (!alreadySelected.add(selected.subjectId())) {
-                    throw new BadRequestException("Una asignatura está seleccionada dos veces");
-                }
-                Subject subject = subjectService.findById(selected.subjectId());
-
-                Enrollment enrollment = new Enrollment();
-                enrollment.setStudent(student);
-                enrollment.setSubject(subject);
-                enrollment.setStudyHours(selected.studyHours());
-                student.getEnrollments().add(enrollment);
+                enrollmentService.enroll(student, selected.subjectId(), request.courseId(),
+                        selected.studyHours(), null);
             }
         }
-        // Al guardar el estudiante se guardan también sus matrículas (cascade = ALL)
-        return studentRepository.save(student);
+        return student;
     }
 }

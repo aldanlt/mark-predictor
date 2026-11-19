@@ -23,7 +23,7 @@ public class Student {
     private double attendance;     // asistencia en % (0-100)
     private double previousGrade;  // nota previa (0-10)
 
-    /** Asignaturas en las que está matriculado, con sus horas. */
+    /** Matrículas del estudiante (su historial académico). */
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Enrollment> enrollments = new ArrayList<>();
 

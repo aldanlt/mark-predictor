@@ -1,8 +1,8 @@
 package es.uvigo.markpredictor.client;
 
+import es.uvigo.markpredictor.config.AppConfig;
 import es.uvigo.markpredictor.exception.ServiceUnavailableException;
 import es.uvigo.markpredictor.model.Difficulty;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -18,12 +18,7 @@ import java.util.Map;
 public class PredictionClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String url;
-
-    /** La dirección del servicio se lee de application.properties. */
-    public PredictionClient(@Value("${prediction.service.url}") String serviceUrl) {
-        this.url = serviceUrl + "/predict";
-    }
+    private final String url = AppConfig.getInstance().getPredictionServiceUrl() + "/predict";
 
     /** difficulty == null -> predicción general (sin coeficiente). */
     public PredictionResult predict(double studyHours, double attendance, double previousGrade,

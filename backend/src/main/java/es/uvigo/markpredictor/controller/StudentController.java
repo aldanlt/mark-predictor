@@ -3,7 +3,9 @@ package es.uvigo.markpredictor.controller;
 import es.uvigo.markpredictor.client.PredictionResult;
 import es.uvigo.markpredictor.dto.EnrollmentPrediction;
 import es.uvigo.markpredictor.dto.StudentRequest;
+import es.uvigo.markpredictor.model.Enrollment;
 import es.uvigo.markpredictor.model.Student;
+import es.uvigo.markpredictor.service.EnrollmentService;
 import es.uvigo.markpredictor.service.PredictionService;
 import es.uvigo.markpredictor.service.StudentService;
 import org.springframework.http.HttpStatus;
@@ -22,10 +24,13 @@ import java.util.List;
 public class StudentController {
 
     private final StudentService studentService;
+    private final EnrollmentService enrollmentService;
     private final PredictionService predictionService;
 
-    public StudentController(StudentService studentService, PredictionService predictionService) {
+    public StudentController(StudentService studentService, EnrollmentService enrollmentService,
+                             PredictionService predictionService) {
         this.studentService = studentService;
+        this.enrollmentService = enrollmentService;
         this.predictionService = predictionService;
     }
 
@@ -45,13 +50,19 @@ public class StudentController {
         return studentService.create(request);
     }
 
+    /** Historial académico completo (P7 · HU-02). */
+    @GetMapping("/{id}/enrollments")
+    public List<Enrollment> history(@PathVariable Long id) {
+        return enrollmentService.history(id);
+    }
+
     /** Predicción general. */
     @GetMapping("/{id}/prediction")
     public PredictionResult prediction(@PathVariable Long id) {
         return predictionService.predictStudent(id);
     }
 
-    /** Predicción de cada asignatura cursada (P6 · HU-02). */
+    /** Predicción de cada matrícula (P6 · HU-02). */
     @GetMapping("/{id}/predictions")
     public List<EnrollmentPrediction> predictions(@PathVariable Long id) {
         return predictionService.predictEnrollments(id);

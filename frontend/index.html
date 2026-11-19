@@ -12,11 +12,14 @@
     <nav class="tabs">
         <button type="button" data-tab="estudiantes" class="active">Estudiantes</button>
         <button type="button" data-tab="asignaturas">Asignaturas</button>
+        <button type="button" data-tab="cursos">Cursos</button>
+        <button type="button" data-tab="matriculas">Matrículas</button>
+        <button type="button" data-tab="informes">Informes</button>
     </nav>
 </header>
 
 <main>
-    <!-- ============ ESTUDIANTES (HU-04 y predicciones HU-02) ============ -->
+    <!-- ============ ESTUDIANTES (P6 · HU-04 y predicciones P6 · HU-02) ============ -->
     <section id="estudiantes" class="tab-panel active">
         <div class="grid">
             <article class="card">
@@ -37,7 +40,11 @@
                         </label>
                     </div>
                     <fieldset>
-                        <legend>Asignaturas que cursa (horas de estudio semanales)</legend>
+                        <legend>Matrícula (opcional)</legend>
+                        <label>Curso académico
+                            <select name="courseId" id="estudiante-curso"></select>
+                        </label>
+                        <p class="hint">Asignaturas del curso y horas de estudio semanales:</p>
                         <div id="estudiante-asignaturas" class="subject-picker"></div>
                     </fieldset>
                     <button type="submit" class="primary">Registrar estudiante</button>
@@ -48,7 +55,7 @@
                 <h2>Estudiantes registrados</h2>
                 <table>
                     <thead>
-                    <tr><th>Nombre</th><th>Asistencia</th><th>Nota previa</th><th>Asignaturas (h/semana)</th><th></th></tr>
+                    <tr><th>Nombre</th><th>Asistencia</th><th>Nota previa</th><th>Matrículas</th><th></th></tr>
                     </thead>
                     <tbody id="tabla-estudiantes"></tbody>
                 </table>
@@ -58,7 +65,7 @@
         <article class="card" id="panel-prediccion" hidden></article>
     </section>
 
-    <!-- ============ ASIGNATURAS (HU-01 y HU-03) ============ -->
+    <!-- ============ ASIGNATURAS (P6 · HU-01 y HU-03) ============ -->
     <section id="asignaturas" class="tab-panel">
         <div class="grid">
             <article class="card">
@@ -85,6 +92,109 @@
                     <thead><tr><th>Nombre</th><th>Dificultad</th></tr></thead>
                     <tbody id="tabla-asignaturas"></tbody>
                 </table>
+            </article>
+        </div>
+    </section>
+
+    <!-- ============ CURSOS ACADÉMICOS (P7 · HU-01) ============ -->
+    <section id="cursos" class="tab-panel">
+        <div class="grid">
+            <article class="card">
+                <h2 id="titulo-curso">Registrar curso académico</h2>
+                <form id="form-curso">
+                    <input type="hidden" name="id">
+                    <label>Nombre
+                        <input name="name" required placeholder="2025/2026">
+                    </label>
+                    <div class="row">
+                        <label>Fecha de inicio
+                            <input name="startDate" type="date" required>
+                        </label>
+                        <label>Fecha de finalización
+                            <input name="endDate" type="date" required>
+                        </label>
+                    </div>
+                    <fieldset>
+                        <legend>Asignaturas que se imparten</legend>
+                        <div id="curso-asignaturas" class="check-list"></div>
+                    </fieldset>
+                    <div class="buttons">
+                        <button type="submit" class="primary">Guardar curso</button>
+                        <button type="button" id="cancelar-curso" class="secondary" hidden>Cancelar edición</button>
+                    </div>
+                </form>
+            </article>
+
+            <article class="card">
+                <h2>Cursos académicos</h2>
+                <table>
+                    <thead><tr><th>Curso</th><th>Fechas</th><th>Asignaturas</th><th></th></tr></thead>
+                    <tbody id="tabla-cursos"></tbody>
+                </table>
+            </article>
+        </div>
+    </section>
+
+    <!-- ============ MATRÍCULAS E HISTORIAL (P7 · HU-02) ============ -->
+    <section id="matriculas" class="tab-panel">
+        <div class="grid">
+            <article class="card">
+                <h2>Nueva matrícula</h2>
+                <form id="form-matricula">
+                    <label>Estudiante
+                        <select name="studentId" class="select-estudiante" required></select>
+                    </label>
+                    <label>Curso académico
+                        <select name="courseId" id="matricula-curso" required></select>
+                    </label>
+                    <label>Asignatura
+                        <select name="subjectId" id="matricula-asignatura" required></select>
+                    </label>
+                    <div class="row">
+                        <label>Horas/semana
+                            <input name="studyHours" type="number" min="0" step="0.5" required>
+                        </label>
+                        <label>Nota (opcional)
+                            <input name="grade" type="number" min="0" max="10" step="0.1" placeholder="0-10">
+                        </label>
+                    </div>
+                    <button type="submit" class="primary">Matricular</button>
+                </form>
+            </article>
+
+            <article class="card">
+                <div class="card-header">
+                    <h2>Historial académico</h2>
+                    <select id="historial-estudiante" class="select-estudiante" aria-label="Estudiante"></select>
+                </div>
+                <table>
+                    <thead><tr><th>Curso</th><th>Asignatura</th><th>Horas</th><th>Nota</th><th>Estado</th><th></th></tr></thead>
+                    <tbody id="tabla-historial"></tbody>
+                </table>
+                <p class="hint">Cambia las horas o la nota y pulsa «Guardar». Deja la nota vacía si aún no está disponible.</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- ============ INFORMES (P7 · HU-06) ============ -->
+    <section id="informes" class="tab-panel">
+        <div class="grid">
+            <article class="card">
+                <h2>Informe académico</h2>
+                <form id="form-informe">
+                    <label>Estudiante
+                        <select name="studentId" class="select-estudiante" required></select>
+                    </label>
+                    <fieldset>
+                        <legend>Formato</legend>
+                        <div class="radio-row">
+                            <label class="inline"><input type="radio" name="format" value="csv" checked> CSV</label>
+                            <label class="inline"><input type="radio" name="format" value="json"> JSON</label>
+                        </div>
+                    </fieldset>
+                    <button type="submit" class="primary">Descargar informe</button>
+                </form>
+                <p class="hint">El informe lo genera el microservicio Python de informes con el historial completo del estudiante.</p>
             </article>
         </div>
     </section>
