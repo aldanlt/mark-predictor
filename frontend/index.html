@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Student Performance Predictor</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topbar">
+    <h1>Student Performance Predictor</h1>
+    <nav class="tabs">
+        <button type="button" data-tab="estudiantes" class="active">Estudiantes</button>
+        <button type="button" data-tab="asignaturas">Asignaturas</button>
+    </nav>
+</header>
+
+<main>
+    <!-- ============ ESTUDIANTES (HU-04 y predicciones HU-02) ============ -->
+    <section id="estudiantes" class="tab-panel active">
+        <div class="grid">
+            <article class="card">
+                <h2>Registrar estudiante</h2>
+                <form id="form-estudiante">
+                    <label>Nombre
+                        <input name="name" required placeholder="Ana García">
+                    </label>
+                    <div class="row">
+                        <label>Horas/semana
+                            <input name="studyHours" type="number" min="0" step="0.5" required>
+                        </label>
+                        <label>Asistencia (%)
+                            <input name="attendance" type="number" min="0" max="100" required>
+                        </label>
+                        <label>Nota previa
+                            <input name="previousGrade" type="number" min="0" max="10" step="0.1" required>
+                        </label>
+                    </div>
+                    <fieldset>
+                        <legend>Asignaturas que cursa (horas de estudio semanales)</legend>
+                        <div id="estudiante-asignaturas" class="subject-picker"></div>
+                    </fieldset>
+                    <button type="submit" class="primary">Registrar estudiante</button>
+                </form>
+            </article>
+
+            <article class="card">
+                <h2>Estudiantes registrados</h2>
+                <table>
+                    <thead>
+                    <tr><th>Nombre</th><th>Asistencia</th><th>Nota previa</th><th>Asignaturas (h/semana)</th><th></th></tr>
+                    </thead>
+                    <tbody id="tabla-estudiantes"></tbody>
+                </table>
+            </article>
+        </div>
+
+        <article class="card" id="panel-prediccion" hidden></article>
+    </section>
+
+    <!-- ============ ASIGNATURAS (HU-01 y HU-03) ============ -->
+    <section id="asignaturas" class="tab-panel">
+        <div class="grid">
+            <article class="card">
+                <h2>Registrar asignatura</h2>
+                <form id="form-asignatura">
+                    <label>Nombre
+                        <input name="name" required placeholder="Algoritmos">
+                    </label>
+                    <label>Dificultad
+                        <select name="difficulty" required>
+                            <option value="" selected disabled>Selecciona un nivel…</option>
+                            <option value="FACIL">Fácil</option>
+                            <option value="MEDIA">Media</option>
+                            <option value="DIFICIL">Difícil</option>
+                        </select>
+                    </label>
+                    <button type="submit" class="primary">Registrar asignatura</button>
+                </form>
+            </article>
+
+            <article class="card">
+                <h2>Asignaturas registradas</h2>
+                <table>
+                    <thead><tr><th>Nombre</th><th>Dificultad</th></tr></thead>
+                    <tbody id="tabla-asignaturas"></tbody>
+                </table>
+            </article>
+        </div>
+    </section>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

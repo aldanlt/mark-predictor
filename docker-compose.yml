@@ -1,0 +1,53 @@
+# Student Performance Predictor
+# Arrancar todo:  docker compose up --build
+# Borrar también los datos de MySQL:  docker compose down -v
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: mark_predictor
+      MYSQL_USER: mark
+      MYSQL_PASSWORD: mark
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql   # aquí se guardan los datos aunque se reinicien los contenedores
+    healthcheck:                    # el backend espera a que MySQL esté listo
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      retries: 30
+
+  prediction-service:
+    build: ./prediction-service
+    ports:
+      - "8000:8000"
+
+  backend:
+    build: ./backend
+    environment:              # se leen en application.properties
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: mark_predictor
+      DB_USER: mark
+      DB_PASSWORD: mark
+      PREDICTION_SERVICE_HOST: prediction-service
+      PREDICTION_SERVICE_PORT: 8000
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      prediction-service:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql-data:
